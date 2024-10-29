@@ -8,7 +8,7 @@
         <!-- evita que alguém de fora do site faça envio do formulário -->
         {% csrf_token %}
         <div class="form-row">
-            <strong>Título:</strong>
+            <strong>Título: {{video.title }}</strong>
             <br/>
             <strong>Status do vídeo:</strong>
             {{ video.get_video_status_display }}
@@ -96,7 +96,7 @@
 
         async function uploadChunk(formData, onChunkUploaded) {
             try {
-                const response = await fetch("{ url 'admin:core_video_upload' id=id}", {
+                const response = await fetch("{% url 'admin:core_video_upload' id=id %}", {
                     method: 'POST',
                     body: formData,
                 });
@@ -133,7 +133,7 @@
             formData.append('fileName', fileName);
             formData.append('totalChunks', totalChunks);
 
-            const response = await fetch("{ url 'admin:core_video_upload_finish' id=id}", {
+            const response = await fetch("{% url 'admin:core_video_upload_finish' id=id %}", {
                 method: POST,
                 body: formData,
             });
@@ -143,17 +143,21 @@
                 throw new Error(`Erro ao finalizar o upload: ${textError}`);
             }
             
-            window.location.href = "{ url 'admin_core_video_upload' id=id}";
+            window.location.href = "{% url 'admin:core_video_upload' id=id %}";
         }
 
         function updateProgress(uploadedChunks, totalChunks) {
             const progressElement = document.getElementById('progress');
             const percentage = Math.floor((uploadedChunks / totalChunks) * 100);
-            progressElement.innerText = `${percentage}`;
-            progressElement.style.width = `${percentage}`;
+            progressElement.innerText = `${percentage}%`;
+            progressElement.style.width = `${percentage}%`;
         }
 
-
+        function displayError(message) {
+        const errorNoteElement = document.getElementById('errornote');
+        errorNoteElement.classList.remove('hidden');
+        errorNoteElement.innerText = message;
+    }
 
     </script>
 {% endblock %}
